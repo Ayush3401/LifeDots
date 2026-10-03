@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LifeDots</string>
+    <string name="tagline">Every dot is one week of your life.</string>
+    <string name="wallpaper_description">A dot for every week of your life: weeks lived, this week, and weeks left.</string>
+</resources>

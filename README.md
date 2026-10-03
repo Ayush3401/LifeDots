@@ -1,56 +1,19 @@
 # LifeDots
 
-A menu-bar app for macOS that sets your desktop wallpaper to a grid of dots. Each dot is one week of your life. Weeks already lived are filled. The current week is highlighted in orange. Weeks remaining are dimmed.
+Your wallpaper as a grid of dots, one for every week of your life. Weeks you've lived are filled in, the current week is orange, and the weeks you have left are dimmed. It updates by itself.
 
-![LifeDots wallpaper](docs/preview.png)
-
-## Requirements
-
-- macOS 13 (Ventura) or later
-- Xcode or the Xcode Command Line Tools (`xcode-select --install`)
-
-## Install
-
-```bash
-git clone https://github.com/Ayush3401/LifeDots.git
-cd LifeDots
-./build.sh --install
-```
-
-This builds the app on your Mac and installs it in `/Applications`, or in `~/Applications` if you don't have admin rights. Because the app is built locally, macOS doesn't show a Gatekeeper warning.
-
-To update later, run `git pull && ./build.sh --install` in the same folder.
-
-## Build only
-
-Running `./build.sh` without `--install` builds `build/LifeDots.app` and does nothing else. On the first launch the Settings window opens. Enter your date of birth and click **Set Wallpaper**. Then choose **Launch at Login** from the menu-bar icon.
-
-For a quick dev loop you can also run `swift run`. Launch at Login only works from the bundled `.app`.
-
-## How it works
-
-| File | Role |
+| macOS | Android |
 |---|---|
-| `LifeCalculator.swift` | Weeks lived and weeks left. Each year is 52 weeks counted from your birthday, so rows don't drift with leap years. |
-| `WallpaperRenderer.swift` | Draws the PNG at each display's native pixel size. It picks the grid shape that gives the largest dots and avoids the menu bar, notch and Dock. |
-| `WallpaperManager.swift` | Writes one PNG per display and applies it with `NSWorkspace.setDesktopImageURL`. |
-| `AppDelegate.swift` | Menu-bar UI and the triggers that cause a redraw. |
-| `SettingsWindowController.swift` | Settings window (plain AppKit, so it builds with just the Command Line Tools). |
+| ![macOS](docs/macos-preview.png) | <img src="docs/android-preview.png" width="220" alt="Android"> |
 
-The wallpaper is redrawn when:
-- the Mac wakes,
-- the day changes,
-- the time zone or display setup changes,
-- you edit a setting.
+## Apps
 
-A 30-minute timer also checks for changes but only renders if the image would differ. Switching Spaces re-applies the current image, because macOS sets a wallpaper for one Space at a time.
+| Platform | How it works | Get it |
+|---|---|---|
+| **macOS** 13+ | Menu-bar app that sets the desktop picture on every display | [macos/](macos/README.md) |
+| **Android** 8.1+ | Live wallpaper that redraws itself each time you look at it | [android/](android/README.md) |
 
-Each render gets a new file name because macOS caches the desktop picture by path. Old renders are deleted from `~/Library/Application Support/LifeDots/Wallpapers`.
-
-## Notes
-
-- **Several Spaces:** a Space you haven't opened since the last update shows the new image as soon as you switch to it.
-- **Uninstall:** turn off Launch at Login, quit the app, then delete `LifeDots.app` from `/Applications` or `~/Applications` and `~/Library/Application Support/LifeDots`.
+Both apps count weeks the same way. Each year has 52 weeks, counted from your birthday, so every year starts a new row and leap years don't shift the grid.
 
 ## License
 
