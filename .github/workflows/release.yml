@@ -84,6 +84,24 @@ jobs:
           path: ${{ runner.temp }}/LifeDots-macOS.zip
           if-no-files-found: error
 
+  ios:
+    name: iOS app (compile check)
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: ios
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Generate Xcode project
+        run: ./generate.sh --no-open
+
+      - name: Build for simulator (unsigned)
+        run: |
+          xcodebuild -project LifeDots.xcodeproj -scheme LifeDots \
+            -destination 'generic/platform=iOS Simulator' -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO -quiet build
+
   release:
     name: Publish release
     if: github.ref_type == 'tag'

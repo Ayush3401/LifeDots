@@ -21,8 +21,9 @@ All versions are on the [Releases page](https://github.com/Ayush3401/LifeDots/re
 |---|---|---|
 | **macOS** 13+ | Menu-bar app that sets the desktop picture on every display | [build from source](macos/README.md) |
 | **Android** 8.1+ | Live wallpaper that redraws itself each time you look at it | [build from source](android/README.md) |
+| **iOS** 17+ | Shortcuts action that updates the Lock Screen nightly, plus Home and Lock Screen widgets | [build from source](ios/README.md) (needs Xcode) |
 
-Both apps count weeks the same way. Each year has 52 weeks, counted from your birthday, so every year starts a new row and leap years don't shift the grid.
+All the apps count weeks the same way. Each year has 52 weeks, counted from your birthday, so every year starts a new row and leap years don't shift the grid.
 
 ## Releasing (for maintainers)
 
