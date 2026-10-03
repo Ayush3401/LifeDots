@@ -10,8 +10,26 @@ android {
         applicationId = "io.github.ayush3401.lifedots"
         minSdk = 27          // Android 8.1: needed for WallpaperColors
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        // CI passes these per release (-PversionName=1.2 -PversionCode=<run number>);
+        // versionCode must keep increasing or phones refuse the update.
+        versionCode = providers.gradleProperty("versionCode").map(String::toInt).getOrElse(1)
+        versionName = providers.gradleProperty("versionName").getOrElse("1.0")
+    }
+
+    // The release key comes from environment variables (GitHub secrets in CI).
+    // Without them, release builds fall back to the local debug key, which is
+    // fine for trying things out but can't update an installed release build.
+    val keystorePath = System.getenv("ANDROID_KEYSTORE_PATH")
+    val releaseSigning = if (keystorePath != null && file(keystorePath).exists()) {
+        signingConfigs.create("release") {
+            storeFile = file(keystorePath)
+            storeType = "pkcs12"
+            storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
+            keyAlias = System.getenv("ANDROID_KEY_ALIAS")
+            keyPassword = System.getenv("ANDROID_KEY_PASSWORD")
+        }
+    } else {
+        signingConfigs.getByName("debug")
     }
 
     buildTypes {
@@ -19,9 +37,7 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
-            // Signed with the local debug key so a release APK can be shared and
-            // sideloaded without extra setup. Use a real keystore before Play Store.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = releaseSigning
         }
     }
 

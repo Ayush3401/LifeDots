@@ -3,26 +3,42 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-swift build -c release
-BIN="$(swift build -c release --show-bin-path)/LifeDots"
+# UNIVERSAL=1 builds for Apple Silicon and Intel (used by the release workflow).
+# VERSION / BUILD_NUMBER set the app's version (defaults: 1.0 / 1).
+VERSION="${VERSION:-1.0}"
+BUILD_NUMBER="${BUILD_NUMBER:-1}"
+
+if [[ "${UNIVERSAL:-0}" == "1" ]]; then
+    BINS=()
+    for ARCH in arm64 x86_64; do
+        swift build -c release --arch "$ARCH"
+        BINS+=("$(swift build -c release --arch "$ARCH" --show-bin-path)/LifeDots")
+    done
+    mkdir -p build
+    lipo -create "${BINS[@]}" -output build/LifeDots-universal
+    BIN="build/LifeDots-universal"
+else
+    swift build -c release
+    BIN="$(swift build -c release --show-bin-path)/LifeDots"
+fi
 
 APP="build/LifeDots.app"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN" "$APP/Contents/MacOS/LifeDots"
 
-cat > "$APP/Contents/Info.plist" <<'PLIST'
+cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
     <key>CFBundleName</key>             <string>LifeDots</string>
     <key>CFBundleDisplayName</key>      <string>LifeDots</string>
-    <key>CFBundleIdentifier</key>       <string>com.ayush.lifedots</string>
+    <key>CFBundleIdentifier</key>       <string>io.github.ayush3401.lifedots</string>
     <key>CFBundleExecutable</key>       <string>LifeDots</string>
     <key>CFBundlePackageType</key>      <string>APPL</string>
-    <key>CFBundleShortVersionString</key><string>1.0</string>
-    <key>CFBundleVersion</key>          <string>1</string>
+    <key>CFBundleShortVersionString</key><string>${VERSION}</string>
+    <key>CFBundleVersion</key>          <string>${BUILD_NUMBER}</string>
     <key>LSMinimumSystemVersion</key>   <string>13.0</string>
     <key>LSUIElement</key>              <true/>
     <key>NSHighResolutionCapable</key>  <true/>
